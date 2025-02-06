@@ -1,8 +1,9 @@
+import click
 from flask import Flask
-from sqlalchemy import SQLAlchemy
+from flask_sqlalchemy import SQLAlchemy
 import errno
 import os
-from sqlalchemy.orm import DeclarativeBase
+from sqlalchemy.orm import DeclarativeBase, mapped_column
 
 # instance folder path
 instance = os.path.join(os.path.dirname(__file__), 'instance')
@@ -19,13 +20,25 @@ app = Flask(__name__)
 
 class Base(DeclarativeBase):
     pass
-db = SQLAlchemy(model_class=Base) # instance of sqlalchemy
-db.init_app(app) # linking sqlalchemy instance to flask app
-
 # configure sqlite db
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///project.db"
-# initialize the app with the extension
-db.init_app(app)
+
+db = SQLAlchemy(model_class=Base) # instance of sqlalchemy
+
+
+# defining models
+class Event(db.Model):
+    date = mapped_column(db.String, primary_key=True)
+    event = mapped_column(db.String)
+
+db.init_app(app) # linking sqlalchemy instance to flask app
+
+@app.cli.command('initdb')
+def initdb():
+    # create the db
+    with app.app_context():
+        db.create_all()
+        click.echo('Initialized the database.')
 
 @app.route('/')
 def index(): # view functions
