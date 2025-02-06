@@ -1,4 +1,5 @@
-flask
+flask~=3.1.0
 flask-sqlalchemy
 flask-wtf
 python-dotenv
+SQLAlchemy~=2.0.37
