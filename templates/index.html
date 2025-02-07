@@ -1,20 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Event Logger</title>
+    <meta charset="UTF-8">
+    <title>Square Of Number!</title>
 </head>
 <body>
-    <h1>Add Event</h1>
-    <form method="POST">
-        <input type="text" name="eventBox" placeholder="Enter event...">
-        <button type="submit">Add Event</button>
-    </form>
-
-    <h2>Past Events</h2>
-    <ul>
-        {% for event in eventsList %}
-            <li>{{ event.date }}: {{ event.event }}</li>
-        {% endfor %}
-    </ul>
+<h1><i> Welcome to the Maths page!</i></h1>
+    <p>Logic shapes every choice of our daily lives.<br>
+    Logical thinking enables someone to learn and
+    make decisions that affect their way of life. !</p>
+    <form method="GET" action ="#">
+        Enter a number :
+        <input type="text" name="num" id="num"></input>
+        <input type="submit" name="btnnum" id="btnnum"></input>
+  </form>
 </body>
 </html>
