@@ -1,20 +1,9 @@
+import datetime
 import click
-from flask import Flask
+from flask import Flask,redirect,render_template,request,url_for
 from flask_sqlalchemy import SQLAlchemy
-import errno
-import os
 from sqlalchemy.orm import DeclarativeBase, mapped_column
 
-# instance folder path
-instance = os.path.join(os.path.dirname(__file__), 'instance')
-
-# instance directory
-try:
-    os.mkdir(instance)
-except OSError as exc:
-    if exc.errno != errno.EEXIST:
-        raise
-    pass
 app = Flask(__name__)
 
 
@@ -40,13 +29,15 @@ def initdb():
         db.create_all()
         click.echo('Initialized the database.')
 
-@app.route('/')
-def index(): # view functions
-    return '<h1>hello world </h1>'
+@app.route('/', methods=['GET', 'POST'])
+def index():
+        if(request.method == 'POST'):
+            db.session.add(Event(date=datetime.datetime.now().__str__(), event=request.form['eventBox']))
+            db.session.commit()
+            return redirect(url_for('index'))
+        return render_template('index.html', eventsList=db.session.execute(db.select(Event).order_by(Event.date)).scalars()) # GET
 
-@app.route('/user/<name>')
-def user(name):
-    return '<h1>Hello %s</h1>' % name
 
+# starts development server
 if __name__ == '__main__' :
     app.run(debug=True)
