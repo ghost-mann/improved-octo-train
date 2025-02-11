@@ -5,8 +5,8 @@ app = Flask(__name__)
 def msg():
     return 'hello'
 
-@app.route('/vint/<int:age>')
-def vint(age):
-    return "my age is %d" % age
+@app.route('/vfloat/<float:weight>')
+def vfloat(weight):
+    return "my weight is %f" % weight
 
 app.run(debug=True)
