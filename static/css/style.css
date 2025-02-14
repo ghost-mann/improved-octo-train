@@ -49,3 +49,27 @@ button {
 button:hover {
     background-color: #218838;
 }
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link,
+.navbar-custom .dropdown-item {
+    color: white !important;
+}
+
+.navbar-custom .dropdown-menu {
+    background-color: #333;
+    border: 1px solid rgba(255,255,255,.15);
+}
+
+.navbar-custom .dropdown-item:hover {
+    background-color: #444;
+}
+
+/* Custom toggler icon color */
+.navbar-custom .navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 1)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.navbar-custom .navbar-toggler {
+    border-color: rgba(255,255,255,.5);
+}

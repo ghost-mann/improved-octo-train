@@ -7,14 +7,14 @@ def inject_dict_for_all_templates():
     nav = [
         {"text":"Home", "url": url_for('index')},
         {"text":"About", "url": url_for('about')},
-        {
-            "text":"More",
-            "sublinks" : [
-                {"text": "Stack Overflow","url":"https://stackoverflow.com"},
-                {"text": "Google", "url":"https://google.com"},
-            ],
-        },
-        {"text": "Login", "url": url_for('login')}
+        {"text": "Login/Sign Up",
+         "sublinks" : [
+             {"text": "Login", "url": "https://stackoverflow.com"},
+             {"text": "Account Settings", "url": "https://google.com"},
+             {"text": "My Orders", "url": "https://google.com"},
+             {"text": "Sign Out", "url": "https://google.com"},
+         ],
+         },
     ]
     return dict(navbar=nav)
 
