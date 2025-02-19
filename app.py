@@ -13,7 +13,7 @@ class Product:
     image_url: str
     category: str
 
-products: [
+products = [
     Product(1, "Beaded Necklace", "Hand-crafted Maasai beaded necklace", 29.99, "/static/images/necklace.jpg", "Jewelry"),
     Product(2, "Woven Basket", "Traditional African woven basket", 49.99, "/static/images/basket.jpg", "Home Decor"),
     Product(3, "Carved Statue", "Wooden hand-carved statue", 79.99, "/static/images/statue.jpg", "Art"),
@@ -28,6 +28,7 @@ def inject_dict_for_all_templates():
     nav = [
         {"text":"Home", "url": url_for('index')},
         {"text":"About", "url": url_for('about')},
+        {"text": "Shop", "url": url_for('shop')},
         {"text": "Login/Sign Up",
          "sublinks" : [
              {"text": "Login", "url": "https://stackoverflow.com"},
