@@ -1,39 +1,24 @@
 from flask import Flask, render_template, url_for, request, redirect, session
-from flask_login import current_user
-from dataclasses import dataclass
-from typing import List
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from models import User, Products, db
+from datetime import datetime
+from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
-app.secret_key = "your_secret_key"
+app.config.from_object(Config)
+db.init_app(app)
+with app.app_context():
+    db.create_all()
 
-@dataclass
-class User:
-    id: int
-    username: str
-    password: str
-    email: str
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'login'
 
-# Simple in-memory user storage
-users = []
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
-@dataclass
-class Product:
-    id: int
-    name: str
-    description: str
-    price: float
-    image_url: str
-    category: str
-
-products = [
-    Product(1, "Beaded Necklace", "Hand-crafted Maasai beaded necklace", 29.99, "/static/images/necklace.jpg", "Jewelry"),
-    Product(2, "Woven Basket", "Traditional African woven basket", 49.99, "/static/images/basket.jpg", "Home Decor"),
-    Product(3, "Carved Statue", "Wooden hand-carved statue", 79.99, "/static/images/statue.jpg", "Art"),
-    Product(4, "Leather Bag", "Handmade leather tote bag", 89.99, "/static/images/bag.jpg", "Accessories"),
-    Product(5, "Fabric Wall Art", "Traditional African fabric wall hanging", 59.99, "/static/images/wall-art.jpg", "Home Decor"),
-    Product(6, "Beaded Bracelet", "Colorful beaded bracelet set", 19.99, "/static/images/bracelet.jpg", "Jewelry"),
-]
 
 @app.context_processor
 def inject_dict_for_all_templates():
@@ -63,7 +48,8 @@ def about():
 
 @app.route('/shop')
 def shop():
-    categories = list(set(product.category for product in products))
+    products = Products.query.all()
+    categories = db.session.query(Products.category).distinct()
     return render_template('shop.html', products=products, categories=categories)
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -72,7 +58,7 @@ def login():
         username = request.form.get("username")
         password = request.form.get("password")
 
-        user = next((user for user in users if user.username == username), None)
+        user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
             session['user_id'] = user.id
@@ -91,21 +77,28 @@ def register():
         if not (username and password and email):
             return render_template("register.html", message="Please fill out all required fields")
 
-        if any(user.username == username for user in users):
+        if User.query.filter_by(username=username).first():
             return render_template("register.html", message="Username already exists")
 
         # Create new user
-        user_id = len(users) + 1
         hashed_password = generate_password_hash(password)
-        new_user = User(id=user_id, username=username, password=hashed_password, email=email)
-        users.append(new_user)
+        new_user = User(
+            username=username,
+            password=hashed_password,
+            email=email,
+            created_at=datetime.utcnow(),
+        )
+
+        db.session.add(new_user)
+        db.session.commit()
 
         return redirect(url_for('login'))
     return render_template("register.html")
 
 @app.route("/logout")
+@login_required
 def logout():
-    session.clear()
+    logout_user()
     return redirect(url_for('index'))
 
 if __name__ == '__main__':
