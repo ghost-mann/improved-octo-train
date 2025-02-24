@@ -1,19 +1,20 @@
-from flask import Flask, render_template, url_for, request, redirect, session
-from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required
+from flask import Flask, render_template, url_for, request, redirect, session, abort
+from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import User, Products, db
 from datetime import datetime
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
+from flask_migrate import Migrate
 
 app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
-with app.app_context():
-    db.create_all()
+migrate = Migrate(app, db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -22,22 +23,36 @@ def load_user(user_id):
 
 @app.context_processor
 def inject_dict_for_all_templates():
+    from flask_login import current_user
     nav = [
         {"text": "Home", "url": url_for('index')},
         {"text": "About", "url": url_for('about')},
         {"text": "Shop", "url": url_for('shop')},
-        {"text": "Login/Sign Up",
-         "sublinks": [
-             {"text": "Login", "url": url_for('login')},
-             {"text": "Register", "url": url_for('register')},
-             {"text": "Account Settings", "url": url_for('login')},
-             {"text": "My Orders", "url": url_for('login')},
-             {"text": "Sign Out", "url": url_for('logout')},
-         ],
-         },
     ]
-    return dict(navbar=nav)
 
+    if current_user.is_authenticated:
+        account_dropdown = {
+            "text": current_user.username,
+            "sublinks": [
+                {"text": "Account Settings", "url": '#'},
+                {"text": "My Orders", "url": '#'},
+                {"text": "Sign Out", "url": url_for('logout')},
+            ]
+        }
+        if current_user.admin:
+            account_dropdown["sublinks"].insert(0,
+                                                {"text": "Admin Panel", "url": url_for('admin_dashboard')})
+        nav.append(account_dropdown)
+    else:
+        nav.append({
+            "text": "Login/Sign Up",
+            "sublinks": [
+                {"text": "Login", "url": url_for('login')},
+                {"text": "Register", "url": url_for('register')},
+            ]
+        })
+
+    return dict(navbar=nav)
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -61,7 +76,9 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            session['user_id'] = user.id
+            login_user(user)  # This is crucial
+            if user.admin:
+                return redirect(url_for('admin_dashboard'))
             return redirect(url_for('index'))
         else:
             return render_template("login.html", message="Wrong username or password")
@@ -95,6 +112,95 @@ def register():
         return redirect(url_for('login'))
     return render_template("register.html")
 
+@app.route('/admin')
+@login_required
+def admin_dashboard():
+    if not current_user.admin:
+        abort(403)
+    return render_template('admin/dashboard.html')
+
+@app.route('/admin/products')
+@login_required
+def admin_products():
+    if not current_user.admin:
+        abort(403)
+    products = Products.query.all()
+    return render_template('admin/products.html', products=products)
+
+@app.route('/admin/products/add', methods=['GET', 'POST'])
+@login_required
+def add_product():
+    if not current_user.admin:
+        abort(403)
+    if request.method == 'POST':
+        # Add product logic
+        new_product = Products(
+            name=request.form['name'],
+            description=request.form['description'],
+            price=float(request.form['price']),
+            category=request.form['category'],
+            image_url=request.form['image_url'],
+            created_at=datetime.utcnow()
+        )
+        db.session.add(new_product)
+        db.session.commit()
+        return redirect(url_for('admin_products'))
+    return render_template('admin/add_product.html')
+
+@app.route('/admin/products/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
+def edit_product(id):
+    if not current_user.admin:
+        abort(403)
+    product = Products.query.get_or_404(id)
+    if request.method == 'POST':
+        product.name = request.form['name']
+        product.description = request.form['description']
+        product.price = float(request.form['price'])
+        product.category = request.form['category']
+        product.image_url = request.form['image_url']
+        db.session.commit()
+        return redirect(url_for('admin_products'))
+    return render_template('admin/edit_product.html', product=product)
+
+@app.route('/admin/products/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_product(id):
+    if not current_user.admin:
+        abort(403)
+    product = Products.query.get_or_404(id)
+    db.session.delete(product)
+    db.session.commit()
+    return redirect(url_for('admin_products'))
+
+# User Management
+@app.route('/admin/users')
+@login_required
+def admin_users():
+    if not current_user.admin:
+        abort(403)
+    users = User.query.all()
+    return render_template('admin/users.html', users=users)
+
+@app.route('/admin/users/toggle_admin/<int:id>', methods=['POST'])
+@login_required
+def toggle_admin(id):
+    if not current_user.admin:
+        abort(403)
+    user = User.query.get_or_404(id)
+    user.admin = not user.admin
+    db.session.commit()
+    return redirect(url_for('admin_users'))
+
+@app.route('/admin/users/delete/<int:id>', methods=['POST'])
+@login_required
+def delete_user(id):
+    if not current_user.admin:
+        abort(403)
+    user = User.query.get_or_404(id)
+    db.session.delete(user)
+    db.session.commit()
+    return redirect(url_for('admin_users'))
 @app.route("/logout")
 @login_required
 def logout():

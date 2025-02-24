@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="admin-container">
+    <h1>Admin Dashboard</h1>
+    <div class="admin-links">
+        <a href="{{ url_for('admin_products') }}" class="admin-card">
+            <h3>Manage Products</h3>
+            <p>View, add, or edit products</p>
+        </a>
+        <a href="{{ url_for('admin_users') }}" class="admin-card">
+            <h3>Manage Users</h3>
+            <p>View and manage user accounts</p>
+        </a>
+    </div>
+</div>
+{% endblock %}
