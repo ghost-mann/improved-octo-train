@@ -10,11 +10,9 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db.init_app(app)
 migrate = Migrate(app, db)
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
-
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -76,7 +74,7 @@ def login():
         user = User.query.filter_by(username=username).first()
 
         if user and check_password_hash(user.password, password):
-            login_user(user)  # This is crucial
+            login_user(user)
             if user.admin:
                 return redirect(url_for('admin_dashboard'))
             return redirect(url_for('index'))
@@ -133,7 +131,6 @@ def add_product():
     if not current_user.admin:
         abort(403)
     if request.method == 'POST':
-        # Add product logic
         new_product = Products(
             name=request.form['name'],
             description=request.form['description'],
