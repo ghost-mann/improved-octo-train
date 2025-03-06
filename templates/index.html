@@ -1,14 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="h-100">
 <head>
-	<meta charset="UTF-8">
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Hazina Crafts{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-<body>
-{% extends "base.html" %}
-{% block title %}Hazina Crafts {% endblock %}
-{% block content %}
-<h1>i am groot</h1>
-{% endblock %}
+<body class="d-flex flex-column h-100">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="#">{{ config.get('SITE_TITLE', 'Hazina Crafts') }}</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% for item in navbar %}
+                        {% if item.sublinks %}
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                {{ item.text }}
+                            </a>
+                            <ul class="dropdown-menu dropdown-menu-dark">
+                                {% for sublink in item.sublinks %}
+                                <li><a class="dropdown-item" href="{{ sublink.url }}">{{ sublink.text }}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </li>
+                        {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ item.url }}">{{ item.text }}</a>
+                        </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <main class="flex-shrink-0" style="padding-top: 80px;">
+        <div class="container">
+            {% block content %}
+            <div id="myCarousel" class="carousel slide" data-bs-ride="carousel">
+                <!-- Indicators -->
+                <div class="carousel-indicators">
+                   <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+                   <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+                   <button type="button" data-bs-target="#myCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+                </div>
+
+                <!-- Slides -->
+                <div class="carousel-inner">
+                   <div class="carousel-item active">
+                      <img src="{{url_for('static', filename='maasai.png')}}" class="d-block w-100" alt="Maasai">
+                      <div class="carousel-caption d-none d-md-block">
+                         <h3></h3>
+                         <p></p>
+                      </div>
+                   </div>
+
+                   <div class="carousel-item">
+                      <img src="{{url_for('static', filename='savannah.png')}}" class="d-block w-100" alt="Savannah">
+                      <div class="carousel-caption d-none d-md-block">
+                         <h3></h3>
+                      </div>
+                   </div>
+
+                   <div class="carousel-item">
+                      <img src="{{url_for('static', filename='placeholder.png')}}" class="d-block w-100" alt="Third slide">
+                      <div class="carousel-caption d-none d-md-block"></div>
+                   </div>
+                </div>
+
+                <!-- Controls -->
+                <button class="carousel-control-prev" type="button" data-bs-target="#myCarousel" data-bs-slide="prev">
+                   <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                   <span class="visually-hidden">Previous</span>
+                </button>
+
+                <button class="carousel-control-next" type="button" data-bs-target="#myCarousel" data-bs-slide="next">
+                   <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                   <span class="visually-hidden">Next</span>
+                </button>
+            </div>
+            {% endblock %}
+        </div>
+    </main>
+    <footer class="footer mt-auto py-3 bg-dark">
+        <div class="container text-center">
+            <span class="text-white">&copy; 2024 Hazina Crafts Ltd.</span>
+        </div>
+    </footer>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
