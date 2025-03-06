@@ -1,21 +1,227 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-</head>
-<body>
 {% extends "base.html" %}
 {% block title %}About Hazina Crafts{% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-md-6">
-        <h1>About Us</h1>
-        <p class="lead">Discover the story behind Hazina Crafts.</p>
-    </div>
-    <div class="col-md-6">
-        <img src="https://via.placeholder.com/600x400" alt="About Image" class="img-fluid">
+<!-- Hero Section -->
+<div class="container-fluid p-0">
+    <div class="position-relative">
+        <img src="{{ url_for('static', filename='about-hero.jpg') }}" alt="Artisans at work" class="img-fluid w-100" style="max-height: 500px; object-fit: cover;">
+        <div class="position-absolute top-50 start-50 translate-middle text-center" style="background-color: rgba(255, 255, 255, 0.8); padding: 2rem; border-radius: 5px;">
+            <h1 class="display-4 fw-bold text-primary pt-5">Our Story</h1>
+            <p class="lead">Blending tradition with modern design since 2010</p>
+        </div>
     </div>
 </div>
+
+<!-- Our Mission -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <h2 class="mb-4 border-bottom border-primary pb-2">Our Mission</h2>
+                <p class="fs-5">At Hazina Crafts, we celebrate the rich cultural heritage of East Africa through exquisite handcrafted items that tell a story. Every piece in our collection represents generations of craftsmanship and artistic tradition.</p>
+                <p class="fs-5">Our mission is to preserve traditional crafting techniques while providing sustainable livelihoods for local artisans. We bridge cultures by bringing these unique treasures to homes around the world.</p>
+            </div>
+            <div class="col-lg-6">
+                <div class="rounded shadow overflow-hidden">
+                    <img src="{{ url_for('static', filename='mission.jpg') }}" alt="Artisan crafting" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Meet Our Artisans -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5 border-bottom border-primary pb-2">Meet Our Artisans</h2>
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <img src="{{ url_for('static', filename='artisan1.jpg') }}" class="card-img-top" alt="Artisan">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Amani Ochieng</h5>
+                        <p class="card-text text-muted">Beadwork Specialist</p>
+                        <p class="card-text">With over 20 years of experience, Amani creates intricate beadwork pieces that reflect Maasai cultural symbolism.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <img src="{{ url_for('static', filename='artisan2.jpg') }}" class="card-img-top" alt="Artisan">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Neema Mutua</h5>
+                        <p class="card-text text-muted">Woodcarving Artist</p>
+                        <p class="card-text">Neema learned traditional woodcarving from her grandfather and now leads our woodwork collective.</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <img src="{{ url_for('static', filename='artisan3.jpg') }}" class="card-img-top" alt="Artisan">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">Jabari Kimathi</h5>
+                        <p class="card-text text-muted">Textile Designer</p>
+                        <p class="card-text">Jabari combines traditional patterns with contemporary designs to create unique textile pieces.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Process -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 border-bottom border-primary pb-2">Our Process</h2>
+        <div class="row g-4">
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-hands text-white fa-2x"></i>
+                    </div>
+                    <h4>Source</h4>
+                    <p>We source sustainable, local materials that reflect East African heritage.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-pencil-ruler text-white fa-2x"></i>
+                    </div>
+                    <h4>Design</h4>
+                    <p>Our artisans blend traditional techniques with contemporary designs.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-tools text-white fa-2x"></i>
+                    </div>
+                    <h4>Craft</h4>
+                    <p>Each piece is meticulously handcrafted with attention to detail.</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="text-center">
+                    <div class="bg-primary rounded-circle d-flex align-items-center justify-content-center mx-auto mb-3" style="width: 80px; height: 80px;">
+                        <i class="fas fa-globe-africa text-white fa-2x"></i>
+                    </div>
+                    <h4>Share</h4>
+                    <p>We bring these cultural treasures to homes around the world.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Our Impact -->
+<section class="py-5">
+    <div class="container">
+        <div class="row align-items-center">
+            <div class="col-lg-6">
+                <div class="rounded shadow overflow-hidden">
+                    <img src="{{ url_for('static', filename='impact.jpg') }}" alt="Community impact" class="img-fluid">
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <h2 class="mb-4 border-bottom border-primary pb-2">Our Impact</h2>
+                <p class="fs-5">Through your support, we've been able to:</p>
+                <ul class="fs-5">
+                    <li>Support over 200 artisans and their families</li>
+                    <li>Fund education for 50 children in our artisan communities</li>
+                    <li>Preserve traditional crafting techniques that might otherwise be lost</li>
+                    <li>Reduce environmental impact through sustainable material sourcing</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Testimonials -->
+<section class="py-5 bg-light">
+    <div class="container">
+        <h2 class="text-center mb-5 border-bottom border-primary pb-2">What People Say</h2>
+        <div class="row">
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="card-text fst-italic">"The beaded necklace I purchased not only looks beautiful but came with a story card about the artisan who made it. I love knowing the history behind my purchase."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="flex-shrink-0">
+                                <img src="{{ url_for('static', filename='customer1.jpg') }}" alt="Customer" class="rounded-circle" width="50">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Sarah Johnson</h6>
+                                <p class="text-muted mb-0">New York, USA</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="card-text fst-italic">"I've decorated my entire living room with pieces from Hazina Crafts. Each item is unique and brings such character to my home. The quality is exceptional."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="flex-shrink-0">
+                                <img src="{{ url_for('static', filename='customer2.jpg') }}" alt="Customer" class="rounded-circle" width="50">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Michael Chen</h6>
+                                <p class="text-muted mb-0">Toronto, Canada</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 mb-4">
+                <div class="card h-100 border-0 shadow-sm">
+                    <div class="card-body">
+                        <div class="mb-3 text-warning">
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                            <i class="fas fa-star"></i>
+                        </div>
+                        <p class="card-text fst-italic">"As someone who values ethical shopping, I appreciate how transparent Hazina Crafts is about their supply chain and fair compensation for artisans. Beautiful products with a beautiful mission."</p>
+                        <div class="d-flex align-items-center mt-3">
+                            <div class="flex-shrink-0">
+                                <img src="{{ url_for('static', filename='customer3.jpg') }}" alt="Customer" class="rounded-circle" width="50">
+                            </div>
+                            <div class="flex-grow-1 ms-3">
+                                <h6 class="mb-0">Emma Okafor</h6>
+                                <p class="text-muted mb-0">London, UK</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Call to Action -->
+<section class="py-5 bg-primary text-white">
+    <div class="container text-center">
+        <h2 class="mb-4">Ready to bring East African artistry into your home?</h2>
+        <p class="lead mb-4">Browse our collection of handcrafted treasures and support our artisan community.</p>
+        <a href="#" class="btn btn-light btn-lg me-2">Shop Now</a>
+        <a href="#" class="btn btn-outline-light btn-lg">Contact Us</a>
+    </div>
+</section>
 {% endblock %}
-</body>
-</html>
