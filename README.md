@@ -1,4 +1,5 @@
 # Welcome to hazina crafts flask project 
+a flask e-com store dedicated to retail of traditional african artefacts and clothing across the continent
 
 # starting the project 
 ```
