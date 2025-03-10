@@ -26,6 +26,7 @@ def inject_dict_for_all_templates():
         {"text": "Home", "url": url_for('index')},
         {"text": "About", "url": url_for('about')},
         {"text": "Shop", "url": url_for('shop')},
+        {"text": "Shop", "url": url_for('shop')},
     ]
 
     if current_user.is_authenticated:

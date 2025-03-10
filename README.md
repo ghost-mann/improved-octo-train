@@ -8,7 +8,7 @@ flask run
 
 # accessing the database
 ```
-psql -U austin -h localhost -p 5433 -d hazina_db
+psql -h pg-3e06a654-austin-ace9.e.aivencloud.com -p 15559 -U avnadmin -d defaultdb
 ```
 
 # adding admins
