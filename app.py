@@ -130,25 +130,30 @@ def admin_products():
 def add_product():
     if not current_user.admin:
         abort(403)
+
+    # category list
+    categories = ['Clothing', 'Artefacts', 'Shoe wear', 'Jewellery']
     if request.method == 'POST':
         new_product = Products(
             name=request.form['name'],
             description=request.form['description'],
             price=float(request.form['price']),
-            category=request.form['category'],
+            category =request.form['category'],
             image_url=request.form['image_url'],
+            quantity=0,
             created_at=datetime.utcnow()
         )
         db.session.add(new_product)
         db.session.commit()
         return redirect(url_for('admin_products'))
-    return render_template('admin/add_product.html')
+    return render_template('admin/add_product.html', categories=categories)
 
 @app.route('/admin/products/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_product(id):
     if not current_user.admin:
         abort(403)
+    categories = ['Clothing', 'Artefacts', 'Shoe wear', 'Jewellery']
     product = Products.query.get_or_404(id)
     if request.method == 'POST':
         product.name = request.form['name']
@@ -158,7 +163,7 @@ def edit_product(id):
         product.image_url = request.form['image_url']
         db.session.commit()
         return redirect(url_for('admin_products'))
-    return render_template('admin/edit_product.html', product=product)
+    return render_template('admin/edit_product.html', product=product, categories=categories)
 
 @app.route('/admin/products/delete/<int:id>', methods=['POST'])
 @login_required

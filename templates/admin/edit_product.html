@@ -22,10 +22,15 @@
                    name="price" value="{{ product.price }}" required>
         </div>
 
-        <div class="mb-3">
-            <label for="category" class="form-label">Category</label>
-            <input type="text" class="form-control" id="category" name="category"
-                   value="{{ product.category }}" required>
+        <div class="form-group col-md-6">
+        <label for="category">Category</label>
+        <select class="form-control" id="category" name="category" required>
+        {% for category in categories %}
+        <option value="{{ category }}" {% if product.category == category %} selected {% endif %}>
+            {{ category }}
+        </option>
+        {% endfor %}
+        </select>
         </div>
 
         <div class="mb-3">
