@@ -56,7 +56,7 @@
                 <label for="category">Category</label>
                 <select class="form-control" id="category" name="category" required>
                     {% for category in categories %}
-                    <option value="{{ category }}" {% if product.category == category %} selected {% endif %}>
+                    <option value="{{ category }}">
                         {{ category }}
                     </option>
                     {% endfor %}
