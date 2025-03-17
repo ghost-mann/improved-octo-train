@@ -29,3 +29,7 @@ class Products(db.Model):
     quantity = db.Column(db.Integer, nullable=False, default=0)
     created_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
     updated_at = db.Column(db.DateTime, nullable=False, default=datetime.utcnow)
+    # foreign key
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)
+    # to access user info
+    user = db.relationship('User', backref=db.backref('products', lazy='dynamic'))

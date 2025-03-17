@@ -141,7 +141,8 @@ def add_product():
             category =request.form['category'],
             image_url=request.form['image_url'],
             quantity=0,
-            created_at=datetime.utcnow()
+            created_at=datetime.utcnow(),
+            user_id=current_user.id
         )
         db.session.add(new_product)
         db.session.commit()

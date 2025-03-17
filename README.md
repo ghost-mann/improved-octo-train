@@ -36,3 +36,8 @@ flask db migrate -m "message"
 flask db upgrade
 ```
 
+# manually telling alembic that db is up to date
+```
+flask db stamp head
+```
+
