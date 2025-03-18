@@ -213,6 +213,15 @@ def account_settings():
         new_password = request.form.get("new_password")
         confirm_password = request.form.get("confirm_password")
         new_email = request.form.get("email")
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        phone = request.form.get("phone")
+        address = request.form.get("address")
+
+        current_user.first_name = first_name
+        current_user.last_name = last_name
+        current_user.phone = phone
+        current_user.address = address
 
         if current_password and not check_password_hash(current_user.password, current_password):
             return render_template('account.html', message="Wrong password")
