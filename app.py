@@ -224,7 +224,7 @@ def account_settings():
         current_user.address = address
 
         if current_password and not check_password_hash(current_user.password, current_password):
-            return render_template('account.html', message="Wrong password")
+            return render_template('account.html', message="Wrong password", message_category="error")
 
         if new_email and new_email != current_user.email:
             if User.query.filter_by(email=new_email).first():
