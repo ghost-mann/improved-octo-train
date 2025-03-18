@@ -32,7 +32,7 @@ def inject_dict_for_all_templates():
         account_dropdown = {
             "text": current_user.username,
             "sublinks": [
-                {"text": "Account Settings", "url": '#'},
+                {"text": "Account Settings", "url": url_for('account_settings')},
                 {"text": "My Orders", "url": '#'},
                 {"text": "Sign Out", "url": url_for('logout')},
             ]
@@ -204,6 +204,29 @@ def delete_user(id):
     db.session.delete(user)
     db.session.commit()
     return redirect(url_for('admin_users'))
+
+@app.route('/account', methods=['GET', 'POST'])
+@login_required
+def account_settings():
+    if request.method == 'POST':
+        current_password = request.form.get("current_password")
+        new_password = request.form.get("new_password")
+        confirm_password = request.form.get("confirm_password")
+        new_email = request.form.get("email")
+
+        if current_password and not check_password_hash(current_user.password, current_password):
+            return render_template('account.html', message="Wrong password")
+
+        if new_email and new_email != current_user.email:
+            if User.query.filter_by(email=new_email).first():
+                return render_template('account.html', message="Email already exists", message_category="error")
+            current_user.password = generate_password_hash(new_password)
+
+        db.session.commit()
+        return render_template('account.html', message="Account settings updated", message_category="success")
+
+    return render_template('account.html')
+
 @app.route("/logout")
 @login_required
 def logout():
