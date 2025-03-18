@@ -122,7 +122,7 @@ def admin_dashboard():
 def admin_products():
     if not current_user.admin:
         abort(403)
-    products = Products.query.all()
+    products = Products.query.join(User, Products.user_id == User.id, isouter=True).all()
     return render_template('admin/products.html', products=products)
 
 @app.route('/admin/products/add', methods=['GET', 'POST'])
