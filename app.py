@@ -1,3 +1,5 @@
+from unicodedata import category
+
 from flask import Flask, render_template, url_for, request, redirect, session, abort
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import User, Products, db
@@ -61,8 +63,13 @@ def about():
 
 @app.route('/shop')
 def shop():
-    products = Products.query.all()
+    # products = Products.query.all()
+    category = request.args.get('category')
     categories = db.session.query(Products.category).distinct()
+    if category:
+        products = Products.query.filter_by(category=category).all()
+    else:
+        products = Products.query.all()
     return render_template('shop.html', products=products, categories=categories)
 
 @app.route('/login', methods=['GET', 'POST'])

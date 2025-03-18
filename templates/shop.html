@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% block title %}Shop - Hazina Crafts{% endblock %}
-
 {% block content %}
 <div class="container py-5">
     <div class="row mb-4">
@@ -8,13 +7,17 @@
             <div class="d-flex justify-content-between align-items-center">
                 <h2 class="mb-0">Our Products</h2>
                 <div class="dropdown">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="categoryFilter" data-bs-toggle="dropdown">
-                        Filter by Category
+                    <button class="btn btn-primary dropdown-toggle" type="button" id="categoryFilter" data-bs-toggle="dropdown">
+                        {% if request.args.get('category') %}
+                            Category: {{ request.args.get('category') }}
+                        {% else %}
+                            Filter by Category
+                        {% endif %}
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="categoryFilter">
-                        <li><a class="dropdown-item" href="#">All Categories</a></li>
+                        <li><a class="dropdown-item {% if not request.args.get('category') %}active{% endif %}" href="{{ url_for('shop') }}">All Categories</a></li>
                         {% for category in categories %}
-                        <li><a class="dropdown-item" href="#">{{ category }}</a></li>
+                        <li><a class="dropdown-item {% if request.args.get('category') == category[0] %}active{% endif %}" href="{{ url_for('shop', category=category[0]) }}">{{ category[0] }}</a></li>
                         {% endfor %}
                     </ul>
                 </div>
@@ -22,12 +25,15 @@
         </div>
     </div>
 
-
     <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
         {% for product in products %}
         <div class="col">
             <div class="card h-100 shadow-sm">
+                {% if product.image_url %}
+                <img src="{{ product.image_url }}" class="card-img-top" alt="{{ product.name }}">
+                {% else %}
                 <img src="{{ url_for('static', filename='placeholder.jpg') }}" class="card-img-top" alt="{{ product.name }}">
+                {% endif %}
                 <div class="card-body">
                     <h5 class="card-title">{{ product.name }}</h5>
                     <p class="card-text">{{ product.description }}</p>
