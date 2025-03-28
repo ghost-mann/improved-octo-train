@@ -1,0 +1,40 @@
+<div class="container">
+    <h1>All Orders</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Order ID</th>
+                <th>Customer</th>
+                <th>Total</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in orders %}
+            <tr>
+                <td>{{ order.id }}</td>
+                <td>{{ order.user.username }}</td>
+                <td>${{ order.total_price|round(2) }}</td>
+                <td>
+                    <form action="{{ url_for('update_order_status', order_id=order.id) }}" method="post">
+                        <select name="status" onchange="this.form.submit()">
+                            <option value="Pending" {% if order.status =='Pending' %}selected{% endif %}>Pending</option>
+                            <option value="Processing" {% if order.status =='Processing' %}selected{% endif %}>Processing</option>
+                            <option value="Shipped" {% if order.status =='Shipped' %}selected{% endif %}>Shipped</option>
+                            <option value="Delivered" {% if order.status =='Delivered' %}selected{% endif %}>Delivered</option>
+                            <option value="Cancelled" {% if order.status =='Cancelled' %}selected{% endif %}>Cancelled</option>
+                        </select>
+                    </form>
+                </td>
+                <td>{{ order.created_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                <td>
+                    <a href="{{ url_for('order_confirmation', order_id=order.id) }}">View Details</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
