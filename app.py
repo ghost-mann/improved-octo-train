@@ -1,5 +1,3 @@
-from unicodedata import category
-
 from flask import Flask, render_template, url_for, request, redirect, session, abort
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import User, Products, db
