@@ -1,6 +1,6 @@
-from flask import Flask, render_template, url_for, request, redirect, session, abort
+from flask import Flask, render_template, url_for, request, redirect, session, abort, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
-from models import User, Products, db
+from models import User, Products, db, Order, CartItem, OrderItem
 from datetime import datetime
 from config import Config
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -70,6 +70,31 @@ def shop():
         products = Products.query.all()
     return render_template('shop.html', products=products, categories=categories)
 
+@app.route('/cart/add', methods=['POST'])
+@login_required
+def cart_add():
+    product_id = request.form.get('product_id')
+    quantity = int(request.form.get('quantity', 1))
+
+    product = Products.query.get_or_404(product_id)
+
+    existing_cart_item = CartItem.query.filter_by(
+        user_id=current_user.id,
+        product_id=product_id,
+    ).first()
+
+    if existing_cart_item:
+        existing_cart_item.quantity += quantity
+    else:
+        cart_item = CartItem(
+            user_id=current_user.id,
+            product_id=product_id,
+            quantity=quantity,
+        )
+        db.session.add(cart_item)
+    db.session.commit()
+    flash('Product added to cart successfully!', 'success')
+    return redirect(url_for('shop'))
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
