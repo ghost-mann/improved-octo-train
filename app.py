@@ -1,3 +1,5 @@
+from crypt import methods
+
 from flask import Flask, render_template, url_for, request, redirect, session, abort, flash
 from flask_login import LoginManager, UserMixin, login_user, logout_user, login_required, current_user
 from models import User, Products, db, Order, CartItem, OrderItem
@@ -115,6 +117,41 @@ def remove_from_cart(cart_item_id):
     db.session.commit()
     flash('Item removed from cart!', 'info')
     return redirect(url_for('view_cart'))
+
+@app.route('/place_order', methods=['POST'])
+@login_required
+def place_order():
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+
+    if not cart_items:
+        flash('Your cart is empty!', 'warning')
+        return redirect(url_for('view_cart'))
+
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
+
+    order = Order(
+        user_id=current_user.id,
+        total_price=total_price,
+        status='Pending'
+    )
+    db.session.add(order)
+
+    for cart_item in cart_items:
+        order_item = OrderItem(
+            order_id=order.id,
+            product_id=cart_item.product.id,
+            quantity=cart_item.quantity,
+            price=cart_item.product.price,
+        )
+        db.session.add(order_item)
+
+    for cart_item in cart_items:
+        db.session.delete(cart_item)
+
+    db.session.commit()
+    flash('Order placed successfully!', 'success')
+    return redirect(url_for('order_confirmation', order_id=order.order_id))
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
