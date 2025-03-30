@@ -119,6 +119,21 @@ def remove_from_cart(cart_item_id):
     flash('Item removed from cart!', 'info')
     return redirect(url_for('view_cart'))
 
+@app.route('/cart/update/<int:cart_item_id>', methods=['POST'])
+@login_required
+def update_cart_item(cart_item_id):
+    quantity = request.form.get('quantity', type=int)
+
+    cart_item = CartItem.query.get_or_404(cart_item_id)
+
+    if quantity is not None and quantity > 0:
+        cart_item.quantity = quantity
+        db.session.commit()
+        flash('Cart item updated successfully!', 'success')
+    else:
+        flash('Invalid quantity!', 'danger')
+
+    return redirect(url_for('cart'))
 @app.route('/place_order', methods=['POST'])
 @login_required
 def place_order():
