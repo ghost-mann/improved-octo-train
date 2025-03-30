@@ -35,7 +35,8 @@ def inject_dict_for_all_templates():
             "text": current_user.username,
             "sublinks": [
                 {"text": "Account Settings", "url": url_for('account_settings')},
-                {"text": "My Orders", "url": '#'},
+                {"text": "My Basket", "url": url_for('cart')},
+                {"text": "My Orders", "url": url_for('user_orders')},
                 {"text": "Sign Out", "url": url_for('logout')},
             ]
         }
@@ -61,7 +62,7 @@ def index():
 def about():
     return render_template('about.html')
 
-@app.route('/shop')
+@app.route('/shop', methods=['GET', 'POST'])
 def shop():
     # products = Products.query.all()
     category = request.args.get('category')
@@ -151,6 +152,46 @@ def place_order():
     db.session.commit()
     flash('Order placed successfully!', 'success')
     return redirect(url_for('order_confirmation', order_id=order.order_id))
+
+
+@app.route('/orders')
+@login_required
+def user_orders():
+    orders = Order.query.filter_by(user_id=current_user.id).order_by(Order.created_at.desc()).all()
+    return render_template('user_orders.html', orders=orders)
+
+
+@app.route('/order/<int:order_id>')
+@login_required
+def order_confirmation(order_id):
+    order = Order.query.filter_by(id=order_id, user_id=current_user.id).first_or_404()
+    return render_template('order_confirmation.html', order=order)
+
+
+# Admin Order Management
+@app.route('/admin/orders')
+@login_required
+def admin_orders():
+    if not current_user.admin:
+        abort(403)
+    orders = Order.query.order_by(Order.created_at.desc()).all()
+    return render_template('admin/orders.html', orders=orders)
+
+
+@app.route('/admin/orders/<int:order_id>/update_status', methods=['POST'])
+@login_required
+def update_order_status(order_id):
+    if not current_user.admin:
+        abort(403)
+
+    order = Order.query.get_or_404(order_id)
+    new_status = request.form.get('status')
+
+    order.status = new_status
+    db.session.commit()
+
+    flash(f'Order status updated to {new_status}', 'success')
+    return redirect(url_for('admin_orders'))
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
