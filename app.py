@@ -95,6 +95,26 @@ def cart_add():
     db.session.commit()
     flash('Product added to cart successfully!', 'success')
     return redirect(url_for('shop'))
+
+@app.route('/cart')
+@login_required
+def cart():
+    cart_items = CartItem.query.filter_by(user_id=current_user.id).all()
+    total_price = sum(item.product.price * item.quantity for item in cart_items)
+    return render_template('cart.html', cart_items=cart_items, total_price=total_price)
+
+@app.route('/cart/remove/<int:cart_item_id>')
+@login_required
+def remove_from_cart(cart_item_id):
+    cart_item = CartItem.query.filter_by(
+        id=cart_item_id,
+        user_id=current_user.id
+    ).first_or_404()
+
+    db.session.delete(cart_item)
+    db.session.commit()
+    flash('Item removed from cart!', 'info')
+    return redirect(url_for('view_cart'))
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
