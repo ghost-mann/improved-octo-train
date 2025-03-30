@@ -141,7 +141,7 @@ def place_order():
 
     if not cart_items:
         flash('Your cart is empty!', 'warning')
-        return redirect(url_for('view_cart'))
+        return redirect(url_for('cart'))
 
     total_price = sum(item.product.price * item.quantity for item in cart_items)
 
@@ -151,10 +151,11 @@ def place_order():
         status='Pending'
     )
     db.session.add(order)
+    db.session.commit()
 
     for cart_item in cart_items:
         order_item = OrderItem(
-            order_id=order.id,
+            order_id=order.id,  # This is correct
             product_id=cart_item.product.id,
             quantity=cart_item.quantity,
             price=cart_item.product.price,
@@ -166,7 +167,7 @@ def place_order():
 
     db.session.commit()
     flash('Order placed successfully!', 'success')
-    return redirect(url_for('order_confirmation', order_id=order.order_id))
+    return redirect(url_for('order_confirmation', order_id=order.id))
 
 
 @app.route('/orders')
