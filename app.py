@@ -155,7 +155,7 @@ def place_order():
 
     for cart_item in cart_items:
         order_item = OrderItem(
-            order_id=order.id,  # This is correct
+            order_id=order.id,
             product_id=cart_item.product.id,
             quantity=cart_item.quantity,
             price=cart_item.product.price,
