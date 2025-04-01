@@ -32,6 +32,20 @@
                 <i class="fas fa-chevron-right"></i>
             </div>
         </a>
+
+        <a href="{{ url_for('admin_orders') }}" class="dashboard-card">
+            <div class="card-icon">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <div class="card-content">
+                <h3>Manage Orders</h3>
+                <p>View, process, and track customer orders</p>
+            </div>
+            <div class="card-arrow">
+                <i class="fas fa-chevron-right"></i>
+            </div>
+        </a>
+
     </div>
 </div>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">

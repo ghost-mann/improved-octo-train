@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="order-detail-container">
+    <div class="order-header">
+        <h1>Order #{{ order.id }}</h1>
+        <div class="order-meta">
+            <p><strong>Date:</strong> {{ order.date_created.strftime('%B %d, %Y at %H:%M') }}</p>
+            <p><strong>Customer:</strong> {{ order.user.name }}</p>
+            <p><strong>Email:</strong> {{ order.user.email }}</p>
+        </div>
+
+        <div class="order-status-section">
+            <p class="current-status">
+                <strong>Status:</strong>
+                <span class="status-badge status-{{ order.status|lower }}">{{ order.status }}</span>
+            </p>
+
+            <form action="{{ url_for('admin_update_order', order_id=order.id) }}" method="POST"
+                  class="status-update-form">
+                <select name="status" class="status-select">
+                    <option value="Pending" {% if order.status=='Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Processing" {% if order.status=='Processing' %}selected{% endif %}>Processing
+                    </option>
+                    <option value="Shipped" {% if order.status=='Shipped' %}selected{% endif %}>Shipped</option>
+                    <option value="Delivered" {% if order.status=='Delivered' %}selected{% endif %}>Delivered</option>
+                    <option value="Cancelled" {% if order.status=='Cancelled' %}selected{% endif %}>Cancelled</option>
+                </select>
+                <button type="submit" class="btn update-status-btn">Update Status</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="order-addresses">
+        <div class="shipping-address">
+            <h3>Shipping Address</h3>
+            <p>{{ order.shipping_address.name }}</p>
+            <p>{{ order.shipping_address.street_address }}</p>
+            <p>{{ order.shipping_address.city }}, {{ order.shipping_address.state }} {{ order.shipping_address.zip_code
+                }}</p>
+            <p>{{ order.shipping_address.country }}</p>
+            <p>Phone: {{ order.shipping_address.phone }}</p>
+        </div>
+
+        <div class="billing-address">
+            <h3>Billing Address</h3>
+            <p>{{ order.billing_address.name }}</p>
+            <p>{{ order.billing_address.street_address }}</p>
+            <p>{{ order.billing_address.city }}, {{ order.billing_address.state }} {{ order.billing_address.zip_code
+                }}</p>
+            <p>{{ order.billing_address.country }}</p>
+            <p>Phone: {{ order.billing_address.phone }}</p>
+        </div>
+    </div>
+
+    <div class="order-items">
+        <h3>Order Items</h3>
+        <table class="order-items-table">
+            <thead>
+            <tr>
+                <th>Product</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Total</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for item in order.items %}
+            <tr>
+                <td class="product-info">
+                    <div class="product-image">
+                        {% if item.product.image %}
+                        <img src="{{ url_for('static', filename='uploads/' + item.product.image) }}"
+                             alt="{{ item.product.name }}">
+                        {% else %}
+                        <div class="no-image">No Image</div>
+                        {% endif %}
+                    </div>
+                    <div class="product-details">
+                        <p class="product-name">{{ item.product.name }}</p>
+                        <p class="product-sku">SKU: {{ item.product.sku }}</p>
+                    </div>
+                </td>
+                <td>${{ "%.2f"|format(item.price) }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>${{ "%.2f"|format(item.price * item.quantity) }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+            <tr class="subtotal-row">
+                <td colspan="3" class="text-right">Subtotal:</td>
+                <td>${{ "%.2f"|format(order.subtotal) }}</td>
+            </tr>
+            {% if order.discount_amount %}
+            <tr class="discount-row">
+                <td colspan="3" class="text-right">Discount:</td>
+                <td>-${{ "%.2f"|format(order.discount_amount) }}</td>
+            </tr>
+            {% endif %}
+            <tr class="shipping-row">
+                <td colspan="3" class="text-right">Shipping:</td>
+                <td>${{ "%.2f"|format(order.shipping_cost) }}</td>
+            </tr>
+            <tr class="tax-row">
+                <td colspan="3" class="text-right">Tax:</td>
+                <td>${{ "%.2f"|format(order.tax) }}</td>
+            </tr>
+            <tr class="total-row">
+                <td colspan="3" class="text-right"><strong>Total:</strong></td>
+                <td><strong>${{ "%.2f"|format(order.total) }}</strong></td>
+            </tr>
+            </tfoot>
+        </table>
+    </div>
+
+    <div class="order-notes">
+        <h3>Order Notes</h3>
+        {% if order.notes %}
+        <p>{{ order.notes }}</p>
+        {% else %}
+        <p class="no-notes">No notes for this order.</p>
+        {% endif %}
+
+        <form action="{{ url_for('admin_add_order_note', order_id=order.id) }}" method="POST" class="add-note-form">
+            <textarea name="note" rows="3" placeholder="Add a note to this order..."></textarea>
+            <button type="submit" class="btn add-note-btn">Add Note</button>
+        </form>
+    </div>
+
+    <div class="order-actions">
+        <a href="{{ url_for('admin_orders') }}" class="btn back-btn">Back to Orders</a>
+        <a href="{{ url_for('admin_print_invoice', order_id=order.id) }}" class="btn print-btn" target="_blank">Print
+            Invoice</a>
+        {% if order.status != 'Cancelled' %}
+        <a href="{{ url_for('admin_cancel_order', order_id=order.id) }}" class="btn cancel-btn"
+           onclick="return confirm('Are you sure you want to cancel this order?')">Cancel Order</a>
+        {% endif %}
+    </div>
+</div>
+
+<link rel="stylesheet" href="{{ url_for('static', filename='admin/css/order-detail.css') }}">
+{% endblock %}

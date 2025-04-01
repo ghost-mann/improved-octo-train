@@ -349,6 +349,27 @@ def delete_user(id):
     db.session.commit()
     return redirect(url_for('admin_users'))
 
+@app.route('/admin/orders/<int:order_id>')
+@login_required
+
+def admin_order_detail(order_id):
+    # Get specific order
+    order = Order.query.get_or_404(order_id)
+    return render_template('admin/order_detail.html', order=order)
+
+@app.route('/admin/orders/<int:order_id>/update', methods=['POST'])
+@login_required
+
+def admin_update_order(order_id):
+    order = Order.query.get_or_404(order_id)
+    status = request.form.get('status')
+
+    if status:
+        order.status = status
+        db.session.commit()
+        flash('Order status updated successfully')
+
+    return redirect(url_for('admin_order_detail', order_id=order_id))
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account_settings():
