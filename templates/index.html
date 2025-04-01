@@ -14,15 +14,27 @@
             left: 50%;
             transform: translate(-50%, -50%);
             text-align: center;
-            color: white; /* Change text color for better visibility */
+            color: white;
+            width: 90%; /* Ensures text doesn't overflow */
         }
+
         .carousel-caption h5 {
-            font-size: 2rem; /* Adjust font size for the title */
+            font-size: 2rem;
             font-weight: bold;
+            background: rgba(0, 0, 0, 0.6); /* Adds a background for readability */
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
+
         .carousel-caption p {
-            font-size: 1.25rem; /* Adjust font size for the description */
+            font-size: 1.25rem;
+            background: rgba(0, 0, 0, 0.5);
+            display: inline-block;
+            padding: 5px 10px;
+            border-radius: 5px;
         }
+
     </style>
 </head>
 <body class="d-flex flex-column h-100">
@@ -40,7 +52,7 @@
                     <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                         {{ item.text }}
                     </a>
-                    <ul class="dropdown-menu dropdown-menu-dark">
+                    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                         {% for sublink in item.sublinks %}
                         <li><a class="dropdown-item" href="{{ sublink.url }}">{{ sublink.text }}</a></li>
                         {% endfor %}

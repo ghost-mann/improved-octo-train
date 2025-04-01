@@ -23,7 +23,7 @@
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                                 {{ item.text }}
                             </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
+                            <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
                                 {% for sublink in item.sublinks %}
                                 <li><a class="dropdown-item" href="{{ sublink.url }}">{{ sublink.text }}</a></li>
                                 {% endfor %}
