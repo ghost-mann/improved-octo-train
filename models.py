@@ -84,7 +84,7 @@ class OrderItem(db.Model):
     product_id = db.Column(db.Integer, db.ForeignKey('products.id'), nullable=False)
     quantity = db.Column(db.Integer, nullable=False)
     price = db.Column(db.Float, nullable=False)
-    seller_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)  # Track the seller directly
+    seller_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=True)  # Track the seller directly
     product = db.relationship('Products', backref='order_items')
     seller = db.relationship('User', foreign_keys=[seller_id])
 

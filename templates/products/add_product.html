@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="form-container">
+    <div class="form-header">
+        <h2 class="form-title">
+            <i class="fas fa-{% if product %}edit{% else %}plus-circle{% endif %}"></i>
+            {% if product %}Edit{% else %}Add New{% endif %} Product
+        </h2>
+        <a href="{{ url_for('add_product') }}" class="btn btn-back">
+            <i class="fas fa-arrow-left"></i> Back to Products
+        </a>
+    </div>
+
+    <form method="POST" class="product-form">
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="name">Product Name</label>
+                <input type="text"
+                       id="name"
+                       name="name"
+                       class="form-control"
+                       value="{{ product.name if product else '' }}"
+                       required>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="price">Price</label>
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">$</span>
+                    </div>
+                    <input type="number"
+                           id="price"
+                           name="price"
+                           class="form-control"
+                           step="0.01"
+                           min="0"
+                           value="{{ product.price if product else '' }}"
+                           required>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group col-md-6">
+                <label for="category">Category</label>
+                <select class="form-control" id="category" name="category" required>
+                    {% for category in categories %}
+                    <option value="{{ category }}">
+                        {{ category }}
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group col-md-6">
+                <label for="image_url">Image URL</label>
+                <input type="url"
+                       id="image_url"
+                       name="image_url"
+                       class="form-control"
+                       value="{{ product.image_url if product else '' }}">
+                <small class="form-text text-muted">Leave blank for default image</small>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description</label>
+            <textarea id="description"
+                      name="description"
+                      class="form-control"
+                      rows="4">{{ product.description if product else '' }}</textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary btn-block">
+                <i class="fas fa-save"></i> Save Product
+            </button>
+        </div>
+    </form>
+
+    {% if product and product.image_url %}
+    <div class="image-preview">
+        <h4>Current Image:</h4>
+        <img src="{{ product.image_url }}" alt="Current product image" class="img-thumbnail">
+    </div>
+    {% endif %}
+</div>
+<script>
+    // Live image preview
+    const imageUrlInput = document.getElementById('image_url');
+    const imagePreview = document.querySelector('.image-preview');
+
+    if (imageUrlInput) {
+        imageUrlInput.addEventListener('input', function() {
+            if (this.value) {
+                if (!imagePreview) {
+                    const previewDiv = document.createElement('div');
+                    previewDiv.className = 'image-preview';
+                    previewDiv.innerHTML = `
+                        <h4>Image Preview:</h4>
+                        <img src="${this.value}" class="img-thumbnail">
+                    `;
+                    this.parentElement.parentElement.after(previewDiv);
+                } else {
+                    imagePreview.querySelector('img').src = this.value;
+                }
+            }
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <div class="seller-profile">
+        <h1>{{ seller.username }}'s Shop</h1>
+
+        <div class="seller-info">
+            <h2>About the Artist</h2>
+            <p>{{ seller.artist_bio }}</p>
+
+            {% if seller.artist_website %}
+            <p><a href="{{ seller.artist_website }}" target="_blank">Visit Website</a></p>
+            {% endif %}
+        </div>
+
+        <h2>Products by {{ seller.username }}</h2>
+
+        <div class="products-grid">
+            {% for product in products %}
+            <div class="product-card">
+                <img src="{{ product.image_url }}" alt="{{ product.name }}">
+                <h3>{{ product.name }}</h3>
+                <p class="price">KES {{ product.price }}</p>
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-primary">View Details</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

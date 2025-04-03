@@ -70,11 +70,30 @@
         </div>
     </div>
 
+    <div class="seller-section">
+        <h2>Seller Dashboard</h2>
+        {% if current_user.is_seller %}
+        <p>You are registered as a seller.</p>
+        <a href="{{ url_for('manage_products') }}" class="btn btn-primary">Manage Your Products</a>
+        <a href="{{ url_for('add_product') }}" class="btn btn-success">Add New Product</a>
+        {% else %}
+        <p>Want to sell your art on our platform?</p>
+        <form action="{{ url_for('become_seller') }}" method="post">
+            <div class="form-group">
+                <label>Artist Bio</label>
+                <textarea name="artist_bio" class="form-control" required></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Register as Seller</button>
+        </form>
+        {% endif %}
+    </div>
+
     <div class="card mt-4">
         <div class="card-body">
             <h4>Account Information</h4>
             <p><strong>Member Since:</strong> {{ current_user.created_at.strftime('%B %d, %Y') }}</p>
-            <p><strong>Account Type:</strong> {% if current_user.admin %}Administrator{% else %}Regular User{% endif %}</p>
+            <p><strong>Account Type:</strong> {% if current_user.admin %}Administrator{% else %}Regular User{% endif %}
+            </p>
         </div>
     </div>
 </div>

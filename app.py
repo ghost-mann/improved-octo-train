@@ -16,6 +16,7 @@ login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
@@ -54,13 +55,17 @@ def inject_dict_for_all_templates():
         })
 
     return dict(navbar=nav)
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+
 @app.route('/about')
 def about():
     return render_template('about.html')
+
 
 @app.route('/shop', methods=['GET', 'POST'])
 def shop():
@@ -72,6 +77,7 @@ def shop():
     else:
         products = Products.query.all()
     return render_template('shop.html', products=products, categories=categories)
+
 
 @app.route('/cart/add', methods=['POST'])
 @login_required
@@ -99,6 +105,7 @@ def cart_add():
     flash('Product added to cart successfully!', 'success')
     return redirect(url_for('shop'))
 
+
 @app.route('/cart')
 @login_required
 def cart():
@@ -106,7 +113,8 @@ def cart():
     total_price = sum(item.product.price * item.quantity for item in cart_items)
     return render_template('cart.html', cart_items=cart_items, total_price=total_price)
 
-@app.route('/cart/remove/<int:cart_item_id>',methods=['GET', 'POST'])
+
+@app.route('/cart/remove/<int:cart_item_id>', methods=['GET', 'POST'])
 @login_required
 def remove_from_cart(cart_item_id):
     cart_item = CartItem.query.filter_by(
@@ -118,6 +126,7 @@ def remove_from_cart(cart_item_id):
     db.session.commit()
     flash('Item removed from cart!', 'info')
     return redirect(url_for('cart'))
+
 
 @app.route('/cart/update/<int:cart_item_id>', methods=['POST'])
 @login_required
@@ -134,6 +143,8 @@ def update_cart_item(cart_item_id):
         flash('Invalid quantity!', 'danger')
 
     return redirect(url_for('cart'))
+
+
 @app.route('/place_order', methods=['POST'])
 @login_required
 def place_order():
@@ -209,6 +220,7 @@ def update_order_status(order_id):
     flash(f'Order status updated to {new_status}', 'success')
     return redirect(url_for('admin_orders'))
 
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -225,6 +237,7 @@ def login():
         else:
             return render_template("login.html", message="Wrong username or password")
     return render_template("login.html")
+
 
 @app.route('/register', methods=["GET", "POST"])
 def register():
@@ -254,6 +267,7 @@ def register():
         return redirect(url_for('login'))
     return render_template("register.html")
 
+
 @app.route('/admin')
 @login_required
 def admin_dashboard():
@@ -261,73 +275,191 @@ def admin_dashboard():
         abort(403)
     return render_template('admin/dashboard.html')
 
-@app.route('/admin/products')
-@login_required
-def admin_products():
-    if not current_user.admin:
-        abort(403)
-    products = Products.query.join(User, Products.user_id == User.id, isouter=True).all()
-    return render_template('admin/products.html', products=products)
 
-@app.route('/admin/products/add', methods=['GET', 'POST'])
+@app.route('/products/manage')
+@login_required
+def manage_products():
+    """Display products for management by either admin or seller."""
+    if current_user.admin:
+        # Admins can see all products
+        products = Products.query.join(User, Products.user_id == User.id, isouter=True).all()
+    elif current_user.is_seller:
+        # Sellers can only see their own products
+        products = Products.query.filter_by(user_id=current_user.id).all()
+    else:
+        abort(403)  # Not authorized
+
+    return render_template('products/manage.html', products=products, is_admin=current_user.admin)
+
+
+@app.route('/products/add', methods=['GET', 'POST'])
 @login_required
 def add_product():
-    if not current_user.admin:
+    """Add a new product (available to both admins and sellers)."""
+    if not (current_user.admin or current_user.is_seller):
         abort(403)
 
     # category list
     categories = ['Clothing', 'Artefacts', 'Shoe wear', 'Jewellery']
+
     if request.method == 'POST':
         new_product = Products(
             name=request.form['name'],
             description=request.form['description'],
             price=float(request.form['price']),
-            category =request.form['category'],
+            category=request.form['category'],
             image_url=request.form['image_url'],
-            quantity=0,
+            quantity=int(request.form.get('quantity', 0)),
             created_at=datetime.utcnow(),
             user_id=current_user.id
         )
         db.session.add(new_product)
         db.session.commit()
-        return redirect(url_for('admin_products'))
-    return render_template('admin/add_product.html', categories=categories)
 
-@app.route('/admin/products/edit/<int:id>', methods=['GET', 'POST'])
+        flash('Product added successfully!', 'success')
+        return redirect(url_for('manage_products'))
+
+    return render_template('products/add_product.html', categories=categories, is_admin=current_user.admin)
+
+
+@app.route('/become_seller', methods=['GET', 'POST'])
+@login_required
+def become_seller():
+    """Allow a regular user to become a seller."""
+    if current_user.is_seller:
+        flash('You are already registered as a seller.', 'info')
+        return redirect(url_for('seller_dashboard'))
+
+    if request.method == 'POST':
+        artist_bio = request.form.get('artist_bio')
+        artist_website = request.form.get('artist_website')
+
+        # Update user to be a seller
+        current_user.is_seller = True
+        current_user.artist_bio = artist_bio
+        current_user.artist_website = artist_website
+
+        db.session.commit()
+        flash('Congratulations! You are now registered as a seller.', 'success')
+        return redirect(url_for('seller_dashboard'))
+
+    return render_template('become_seller.html')
+
+
+@app.route('/seller/dashboard')
+@login_required
+def seller_dashboard():
+    """Dashboard for sellers to manage their products and profile."""
+    if not current_user.is_seller:
+        flash('You must be a registered seller to access this page.', 'warning')
+        return redirect(url_for('become_seller'))
+
+    # Get all products by this seller
+    products = Products.query.filter_by(user_id=current_user.id).all()
+
+    # Get basic stats
+    total_products = len(products)
+
+    return render_template('seller/dashboard.html',
+                           seller=current_user,
+                           products=products,
+                           total_products=total_products)
+
+
+@app.route('/seller/<int:user_id>')
+def seller_profile(user_id):
+    """Public profile page for a seller, viewable by anyone."""
+    seller = User.query.get_or_404(user_id)
+
+    if not seller.is_seller:
+        flash('This user is not a seller.', 'warning')
+        return redirect(url_for('shop'))
+
+    # Get all products by this seller
+    products = Products.query.filter_by(user_id=seller.id).all()
+
+    return render_template('seller/public_profile.html', seller=seller, products=products)
+
+
+@app.route('/products/edit/<int:id>', methods=['GET', 'POST'])
 @login_required
 def edit_product(id):
-    if not current_user.admin:
-        abort(403)
-    categories = ['Clothing', 'Artefacts', 'Shoe wear', 'Jewellery']
+    """Edit a product (available to both admins and the seller who owns it)."""
     product = Products.query.get_or_404(id)
+
+    # Check permissions - admin can edit any product, sellers can only edit their own
+    if not (current_user.admin or (current_user.is_seller and product.user_id == current_user.id)):
+        abort(403)
+
+    categories = ['Clothing', 'Artefacts', 'Shoe wear', 'Jewellery']
+
     if request.method == 'POST':
         product.name = request.form['name']
         product.description = request.form['description']
         product.price = float(request.form['price'])
         product.category = request.form['category']
         product.image_url = request.form['image_url']
-        db.session.commit()
-        return redirect(url_for('admin_products'))
-    return render_template('admin/edit_product.html', product=product, categories=categories)
 
-@app.route('/admin/products/delete/<int:id>', methods=['POST'])
+        # Allow updating quantity
+        if 'quantity' in request.form:
+            product.quantity = int(request.form['quantity'])
+
+        db.session.commit()
+        flash('Product updated successfully!', 'success')
+        return redirect(url_for('manage_products'))
+
+    return render_template('products/edit_product.html',
+                           product=product,
+                           categories=categories,
+                           is_admin=current_user.admin)
+
+
+@app.route('/products/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_product(id):
-    if not current_user.admin:
-        abort(403)
+    """Delete a product (available to both admins and the seller who owns it)."""
     product = Products.query.get_or_404(id)
+
+    # Check permissions - admin can delete any product, sellers can only delete their own
+    if not (current_user.admin or (current_user.is_seller and product.user_id == current_user.id)):
+        abort(403)
+
     db.session.delete(product)
     db.session.commit()
-    return redirect(url_for('admin_products'))
+    flash('Product deleted successfully!', 'success')
+    return redirect(url_for('manage_products'))
 
-# User Management
-@app.route('/admin/users')
+
+# Admin-only routes for user management
+@app.route('/admin/users', endpoint='admin_users')
 @login_required
 def admin_users():
+    """Admin-only route to manage all users."""
     if not current_user.admin:
         abort(403)
+
     users = User.query.all()
     return render_template('admin/users.html', users=users)
+
+
+@app.route('/admin/users/toggle_seller/<int:user_id>', methods=['POST'])
+@login_required
+def toggle_seller_status(user_id):
+    """Admin-only route to toggle a user's seller status."""
+    if not current_user.admin:
+        abort(403)
+
+    user = User.query.get_or_404(user_id)
+    user.is_seller = not user.is_seller
+    db.session.commit()
+
+    status = "granted" if user.is_seller else "revoked"
+    flash(f'Seller status {status} for {user.username}', 'success')
+    return redirect(url_for('admin_users'))
+
+
+# User Management
+
 
 @app.route('/admin/users/toggle_admin/<int:id>', methods=['POST'])
 @login_required
@@ -339,6 +471,7 @@ def toggle_admin(id):
     db.session.commit()
     return redirect(url_for('admin_users'))
 
+
 @app.route('/admin/users/delete/<int:id>', methods=['POST'])
 @login_required
 def delete_user(id):
@@ -349,17 +482,17 @@ def delete_user(id):
     db.session.commit()
     return redirect(url_for('admin_users'))
 
+
 @app.route('/admin/orders/<int:order_id>')
 @login_required
-
 def admin_order_detail(order_id):
     # Get specific order
     order = Order.query.get_or_404(order_id)
     return render_template('admin/order_detail.html', order=order)
 
+
 @app.route('/admin/orders/<int:order_id>/update', methods=['POST'])
 @login_required
-
 def admin_update_order(order_id):
     order = Order.query.get_or_404(order_id)
     status = request.form.get('status')
@@ -370,6 +503,8 @@ def admin_update_order(order_id):
         flash('Order status updated successfully')
 
     return redirect(url_for('admin_order_detail', order_id=order_id))
+
+
 @app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account_settings():
@@ -401,11 +536,13 @@ def account_settings():
 
     return render_template('account.html')
 
+
 @app.route("/logout")
 @login_required
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
 
 if __name__ == '__main__':
     app.run(debug=True)
